@@ -1,5 +1,5 @@
 import * as Knex from "knex";
-
+import { User } from "./models";
 
 export class UserService {
 
@@ -8,5 +8,9 @@ export class UserService {
     getByUsername(username: string) {
         return this.knex.select('*').from("users").where("username", username).limit(1);
     }
-    
+
+    addUser(user: User) {
+        return this.knex.insert(user).into('users').returning('id');
+    }
+
 }

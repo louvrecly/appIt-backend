@@ -77,3 +77,11 @@ interface Sys {
     sunrise: number,
     sunset: number
 }
+
+export interface User {
+    id?: number,
+    username: string,
+    password: string,
+    created_at?: Date,
+    updated_at?: Date
+}

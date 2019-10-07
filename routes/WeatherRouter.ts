@@ -8,18 +8,15 @@ export class WeatherRouter {
 
     constructor(private weatherService: WeatherService, private weatherAPIService: WeatherAPIService) { }
 
-    router() {
+    public router() {
         const router = express.Router();
-
-        router.get('/:q', this.get);
-        
+        router.get('/:city', this.get);
         return router;
     }
 
     get = async (req: express.Request, res: express.Response) => {
         try {
-            const cityName = req.params.q.toLowerCase();
-            console.log({ cityName });
+            const cityName = req.params.city.toLowerCase();
             const resp = await this.weatherAPIService.get(cityName);
             const result: CityWeather = await resp.json();
             if (result.cod === 200) {
@@ -43,7 +40,11 @@ export class WeatherRouter {
                 res.status(200).json({ isSuccess: true, cityWeather: result });
             } else {
                 const [cityWeather] = await this.weatherService.get(cityName);
-                res.status(200).json({ isSuccess: true, cityWeather });
+                if (cityWeather) {
+                    res.status(200).json({ isSuccess: true, cityWeather });
+                } else {
+                    res.status(404).json({ isSuccess: false, msg: "city not found in database!" });
+                }
             }
         } catch(err) {
             console.log(err.toString());

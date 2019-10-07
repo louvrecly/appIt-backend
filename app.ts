@@ -6,7 +6,10 @@ import * as moment from "moment";
 import { UserService } from "./services/UserService";
 import { WeatherService } from "./services/WeatherService";
 import { WeatherAPIService } from "./services/WeatherAPIService";
+import { AuthRouter } from "./routes/AuthRouter";
 import { WeatherRouter } from "./routes/WeatherRouter";
+import { isLoggedIn } from "./guards";
+import "./passport";
 
 
 const app = express();
@@ -18,6 +21,7 @@ export const userService = new UserService(knex);
 const weatherService = new WeatherService(knex);
 const weatherAPIService = new WeatherAPIService();
 
+const authRouter = new AuthRouter(userService);
 const weatherRouter = new WeatherRouter(weatherService, weatherAPIService);
 
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -31,6 +35,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/weather', weatherRouter.router());
+app.use('/auth', authRouter.router());
+app.use('/weather', isLoggedIn, weatherRouter.router());
 
 app.listen(PORT, () => console.log(`Listening to http://localhost:${PORT}...`));
